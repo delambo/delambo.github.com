@@ -246,8 +246,11 @@ window.setTimeout(function() {
     border-color: #EED3D7;
   }
 
-  .centered {
+  .no-results {
     text-align: center;
+    padding: 11px;
+    color: #999;
+    font-size: 13px;
   }
 
 </style>
@@ -328,7 +331,10 @@ var json = {
       };
 
       (function($) {
-        var storyCache = [], articleCount = 0, limit = getParameter('fetch_limit');
+        var storyCache = [],
+          articleCount = 0,
+          nArticles = 25,
+          limit = getParameter('fetch_limit') || nArticles;
 
         var getDate = function(ts) {
           return moment(ts*1000).format('MMMM DD YYYY');
@@ -366,7 +372,7 @@ var json = {
         }
 
         var getLede = function(model) {
-          if (!model) return '<span class="centered">No articles</span>';
+          if (!model) return '<div class="no-results">No articles</div>';
 
           var crop = getCrop(model);
           var daysOld = 0; //getDaysFrom(model.printPubDate);
@@ -416,13 +422,22 @@ var json = {
           $('.cColumn .columnGroup').prepend(getStory(model));
         };
 
-        var updateArticleCount = function() {
-          if (articleCount < 25)
-            articleCount++;
-          else
-            $('.columnHeader').addClass('alert');
+        var updateArticleCount = function(hasUpdate) {
+          if (hasUpdate) {
+            if (articleCount < limit) articleCount++;
+            else $('.columnHeader').addClass('alert');
+          }
 
-          $('.columnHeader').text(articleCount + ' out of ' + limit + ' article limit');
+          $('.columnHeader').text((articleCount || '0') + ' out of ' + limit + ' article limit');
+        };
+
+        var updatePage = function(model) {
+          renderLede(model);
+          if (model) {
+            renderStory(storyCache[0]);
+            storyCache.unshift(model);
+          }
+          updateArticleCount(!!model);
         };
 
         $('#searchButton').click(function() {
@@ -439,21 +454,13 @@ var json = {
             dataType: 'json',
             success: function(model) {
               setTimeout(function() {
-                renderLede(model);
-                renderStory(storyCache[0]);
-                storyCache.unshift(model);
-                updateArticleCount();
+                updatePage(model);
                 $('.abColumn').fadeTo('fast', '1');
               }, 200);
             },
             error: function(e, f, g) {
               console.log('something bad happened', e, f, g);
-              setTimeout(function() {
-                renderLede(json);
-                renderStory(storyCache[0]);
-                storyCache.unshift(json);
-                $('.abColumn').fadeTo('fast', '1');
-              }, 200);
+              updatePage();
             }
           });
           
