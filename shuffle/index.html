@@ -383,6 +383,7 @@ window.setTimeout(function() {
 
     if (limit) data.limit = limit;
     if (articleCount == 0) data.new = true;
+    console.log(articleCount, data)
 
     $.ajax({
       type: 'get',
