@@ -356,7 +356,8 @@ window.setTimeout(function() {
   var updateArticleCount = function(hasUpdate) {
     if (hasUpdate) {
       if (articleCount < limit) articleCount++;
-      else $('.columnHeader').addClass('alert');
+    } else {
+      $('.columnHeader').addClass('alert');
     }
 
     $('.columnHeader').text((articleCount || '0') + ' out of ' + limit + ' article limit');
