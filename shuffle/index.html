@@ -362,6 +362,11 @@ window.setTimeout(function() {
     $('.columnHeader').text((articleCount || '0') + ' out of ' + limit + ' article limit');
   };
 
+  var hasKeys = function(obj) {
+    for (var key in obj) return true;
+    return false;
+  };
+
   var updatePage = function(model) {
     renderLede(model);
     if (model) {
@@ -388,7 +393,7 @@ window.setTimeout(function() {
       },
       success: function(model) {
         setTimeout(function() {
-          updatePage(model);
+          updatePage(hasKeys(model) ? model : null);
           $('.abColumn').fadeTo('fast', '1');
         }, 200);
       },
