@@ -381,7 +381,7 @@ window.setTimeout(function() {
     var data = $('#searchForm').serialize();
 
     if (articleCount == 0) data += '&new=true';
-    console.log(articleCount, data)
+    if (limit != nArticles) data += '&fetch_limit=' + limit;
 
     $.ajax({
       type: 'get',
